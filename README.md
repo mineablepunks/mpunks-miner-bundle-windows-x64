@@ -4,6 +4,10 @@ THIS IS EXPERIMENTAL SOFTWARE. USE AT YOUR OWN RISK.
 
 Read LICENSE and NOTICE.
 
+VirusTotal scan of `mpunks-miner-controller.exe`: https://www.virustotal.com/gui/file/ea3ff1ce72a9cee5b12e93568ad3c5129bca3c260e9908ad0706cec0c75c7f61/detection
+
+**If you would like to run the `mpunks-miner-controller` from source instead of using the executable, feel free to clone the repository:** https://github.com/mineablepunks/mpunks-miner-controller
+
 ## How to Mine
 
 Skipping any of these steps will result in issues. Please take the time to read all of this.
