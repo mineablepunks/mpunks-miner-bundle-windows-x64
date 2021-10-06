@@ -49,5 +49,8 @@ Double-click the executable, or from within your favorite terminal run `./mpunks
 - `cd` into this directory
 - Run `python mpunks-miner-supervisor.py`
 
+
+# THE `mpunks-miner-controller` MUST BE RUNNING in order for the `mpunks-miner-supervisor` to work!
+
 ## Notes
 - The `mpunks-miner-supervisor` should print `>>> STATS` lines that show your hash rate, as well as how many nonces have been tried so far.
