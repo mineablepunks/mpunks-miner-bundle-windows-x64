@@ -13,16 +13,14 @@ VirusTotal scan of `mpunks-miner-controller.exe`: https://www.virustotal.com/gui
 Skipping any of these steps will result in issues. Please take the time to read all of this.
 
 ### Step 1: Configure the `mpunks-miner-controller`
-Create a `.env.local` file from the `.env` template like this:
-```
-cp .env .env.local
-```
+Create a `.env.local` file from the `.env` template.
+
 Read LICENSE and NOTICE. Then fill in environment variables within `.env.local`.
 
 Special notes:
 
 `PRIVATE_KEY`
-
+- THE PRIVATE KEY MUST BE PREFIXED WITH `0x`
 - For this miner to automatically submit valid nonces, you will need to populate the PRIVATE_KEY variable with your wallet private key. For security reasons, we recommend making a new wallet and depositing a smaller amount of ETH to pay for transaction fees. A minimum of 0.1 ETH is required for this.
 
 - **Again, without PRIVATE_KEY, the miner won't be able to submit valid nonces for you. You will have to watch the mining output and manually submit the nonces.**
@@ -36,7 +34,9 @@ Special notes:
 - **THE DEFAULT IS 150 GWEI. This could result in a worst-case mint transaction cost of 0.21 ETH!**
 
 ### Step 2: Set up the `mpunks-miner-supervisor`
-- Install Python 3.9
+- Install Python 3
+  - You can do this by downloading/installing Python 3 for Windows from the official Python website.
+  - **Be sure to add the `python` executable (and `pip`) to your PATH**
 - Open up a terminal (`cmd.exe` or `powershell.exe` will do)
 - `cd` into this directory
 - Run `pip install -r requirements.txt`
