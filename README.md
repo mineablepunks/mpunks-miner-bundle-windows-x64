@@ -33,7 +33,7 @@ The `mpunks-miner-worker` writes valid nonces out as files to a `validNonces` di
 - #### Updated GPU drivers
 - #### Python 3.9 (<= 3.8 WILL NOT WORK)
 - #### A WEB3 RPC endpoint
-  - #### Make an Infura or Alchemy account for this
+  - #### Make an Infura or Alchemy account for this. You'll need to make a project and then get the web3 url for your project.
 
 ## How to Mine
 
