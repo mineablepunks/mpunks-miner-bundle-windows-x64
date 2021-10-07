@@ -55,6 +55,7 @@ Special notes:
 
 - THE PRIVATE KEY MUST BE PREFIXED WITH `0x`
 - To export from metamask: https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key
+  - Make sure you add `0x` in front of your private key since metamask doesn't add it for you!
 - For this miner to automatically submit valid nonces, you will need to populate the PRIVATE_KEY variable with your wallet private key. For security reasons, we recommend making a new wallet and depositing a smaller amount of ETH to pay for transaction fees.
 
   - The "smaller amount of ETH to pay for transaction fees" should be around 0.1 ETH on the safe side (varies based on gas price)
