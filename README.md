@@ -28,6 +28,7 @@ The `mpunks-miner-worker` writes valid nonces out as files to a `validNonces` di
 
 ## Requirements
 
+- #### Windows
 - #### An NVIDIA GPU
 - #### Updated GPU drivers
 - #### Python 3.9 (<= 3.8 WILL NOT WORK)
