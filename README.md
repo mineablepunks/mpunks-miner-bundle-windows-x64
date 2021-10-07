@@ -31,7 +31,7 @@ The `mpunks-miner-worker` writes valid nonces out as files to a `validNonces` di
 - #### Windows
 - #### An NVIDIA GPU
 - #### Updated GPU drivers
-- #### Python 3.9 (<= 3.8 WILL NOT WORK)
+- #### Python 3.9 or above (<= 3.8 WILL NOT WORK)
 - #### A WEB3 RPC endpoint
   - #### Make an Infura or Alchemy account for this. You'll need to make a project and then get the web3 url for your project.
 
@@ -71,7 +71,7 @@ Special notes:
 
 ### Step 3: Set up the `mpunks-miner-supervisor`
 
-- Install Python 3.9 (<= 3.8 WILL NOT WORK) or upgrade existing Python to 3.9
+- Install Python 3.9 or above (<= 3.8 WILL NOT WORK) or upgrade existing Python to 3.9
   - You can do this by downloading/installing Python 3.9 for Windows from the official Python website.
   - **Be sure to add the `python` executable (and `pip`) to your PATH**
 - Open up a terminal (`cmd.exe` or `powershell.exe` will do)
