@@ -25,6 +25,7 @@ Special notes:
 `PRIVATE_KEY`
 
 - THE PRIVATE KEY MUST BE PREFIXED WITH `0x`
+- To export from metamask: https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key
 - For this miner to automatically submit valid nonces, you will need to populate the PRIVATE_KEY variable with your wallet private key. For security reasons, we recommend making a new wallet and depositing a smaller amount of ETH to pay for transaction fees. A minimum of 0.1 ETH is required for this.
 
 - **Again, without PRIVATE_KEY, the miner won't be able to submit valid nonces for you. You will have to watch the mining output and manually submit the nonces.**
