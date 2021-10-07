@@ -8,6 +8,32 @@ VirusTotal scan of `mpunks-miner-controller.exe`: https://www.virustotal.com/gui
 
 **If you would like to run the `mpunks-miner-controller` from source instead of using the executable, feel free to clone the repository:** https://github.com/mineablepunks/mpunks-miner-controller
 
+## The components and how they work together
+
+#### `mpunks-miner-controller`
+
+See the git repo for an explanation: https://github.com/mineablepunks/mpunks-miner-controller
+
+#### `mpunks-miner-worker`
+
+This is the compiled CUDA GPU miner. This is also open sourced here: https://github.com/mineablepunks/mpunks-miner-worker.
+
+#### `mpunks-miner-supervisor`
+
+This process manages the inputs, outputs, and lifecycle of the `mpunks-miner-worker`.
+
+The `mpunks-miner-controller` provides mining inputs for the `mpunks-miner-worker`. The `mpunks-miner-supervisor` takes those inputs and creates the worker process, and restarts the worker when those inputs change.
+
+The `mpunks-miner-worker` writes valid nonces out as files to a `validNonces` directory that the `mpunks-miner-supervisor` watches in order to submit the nonces to the `mpunks-miner-controller`.
+
+## Requirements
+
+- #### An NVIDIA GPU
+- #### Updated GPU drivers
+- #### Python 3.9 (<= 3.8 WILL NOT WORK)
+- #### A WEB3 RPC endpoint
+  - #### Make an Infura or Alchemy account for this
+
 ## How to Mine
 
 Skipping any of these steps will result in issues. Please take the time to read all of this.
@@ -18,7 +44,9 @@ Skipping any of these steps will result in issues. Please take the time to read 
 
 Create a `.env.local` file from the `.env` template.
 
-Read LICENSE and NOTICE. Then fill in environment variables within `.env.local`.
+Read LICENSE and NOTICE.
+
+Then, fill in environment variables within `.env.local`. If you agree with the LICENSE and NOTICE, and if you agree with the value of `MAX_GAS_PRICE_GWEI`, set those fields to `true`.
 
 Special notes:
 
@@ -26,22 +54,24 @@ Special notes:
 
 - THE PRIVATE KEY MUST BE PREFIXED WITH `0x`
 - To export from metamask: https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key
-- For this miner to automatically submit valid nonces, you will need to populate the PRIVATE_KEY variable with your wallet private key. For security reasons, we recommend making a new wallet and depositing a smaller amount of ETH to pay for transaction fees. A minimum of 0.1 ETH is required for this.
+- For this miner to automatically submit valid nonces, you will need to populate the PRIVATE_KEY variable with your wallet private key. For security reasons, we recommend making a new wallet and depositing a smaller amount of ETH to pay for transaction fees.
+
+  - The "smaller amount of ETH to pay for transaction fees" should be around 0.1 ETH on the safe side (varies based on gas price)
 
 - **Again, without PRIVATE_KEY, the miner won't be able to submit valid nonces for you. You will have to watch the mining output and manually submit the nonces.**
 
 `WEB3_HOST`
 
-- This must point to a valid Ethereum node URL. The default of `https://cloudflare-eth.com` should work, but we have noticed instability with this node. We recommend making a free `infura` or `alchemy` account instead of using `cloudflare-eth`.
+- This must point to a valid Ethereum node URL. We have found that `https://cloudflare-eth.com` is very unstable and we do not recommend using this endpoint. We recommend making a free `infura` or `alchemy` account.
 
 `MAX_GAS_PRICE_GWEI`
 
-- **THE DEFAULT IS 150 GWEI. This could result in a worst-case mint transaction cost of 0.21 ETH!**
+- **THE DEFAULT IS 150 GWEI. This could result in a worst-case mint transaction cost of 0.21 ETH! Make sure you are okay with this.**
 
 ### Step 3: Set up the `mpunks-miner-supervisor`
 
-- Install Python 3
-  - You can do this by downloading/installing Python 3 for Windows from the official Python website.
+- Install Python 3.9 (<= 3.8 WILL NOT WORK) or upgrade existing Python to 3.9
+  - You can do this by downloading/installing Python 3.9 for Windows from the official Python website.
   - **Be sure to add the `python` executable (and `pip`) to your PATH**
 - Open up a terminal (`cmd.exe` or `powershell.exe` will do)
 - `cd` into this directory
