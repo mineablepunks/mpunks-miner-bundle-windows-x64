@@ -20,6 +20,7 @@ SUBMITTED_WORK_FILENAME = default_config["SubmittedWorkFilename"]
 WORKER_EXECUTABLE_PATH = default_config["WorkerExecutablePath"]
 VALID_NONCES_DIRECTORY = default_config["ValidNoncesDirectory"]
 CONTROLLER_URI = default_config["ControllerUri"]
+DEVICE_LIST_STRING = default_config.get("DeviceList") or "0"
 # END
 
 def create_valid_nonces_directory():
@@ -41,7 +42,7 @@ def append_submitted_nonce(nonce):
         f.write('\n')
 
 
-def spawn_worker(sender_bits, last_mined_assets, difficulty_target, nonces_directory):
+def spawn_worker(sender_bits, last_mined_assets, difficulty_target, nonces_directory, device_id):
     if not os.path.exists(WORKER_EXECUTABLE_PATH):
         raise Exception(f"Worker Executable Path '{WORKER_EXECUTABLE_PATH}' not found!")
 
@@ -51,8 +52,16 @@ def spawn_worker(sender_bits, last_mined_assets, difficulty_target, nonces_direc
         '-a', sender_bits,
         '-l', last_mined_assets,
         '-d', difficulty_target,
-        '-n', nonces_directory
+        '-n', nonces_directory,
+        '-x', device_id
     ])
+
+
+class NonceStatus:
+    FAILS_DIFFICULTY_TEST = "FAILS_DIFFICULTY_TEST"
+    PRODUCES_EXISTING_MPUNK = "PRODUCES_EXISTING_MPUNK"
+    PRODUCES_EXISTING_OG_PUNK = "PRODUCES_EXISTING_OG_PUNK"
+    VALID = "VALID"
 
 
 def main():
@@ -64,7 +73,8 @@ def main():
     thread_state = {
         'recentlyFetchedInputs': None,
         'workerManagerInputs': None,
-        'processes': []
+        'processes': [],
+        'exit': False
     }
 
     def kill_workers():
@@ -104,8 +114,25 @@ def main():
                     sender_address = recently_fetched_inputs['senderAddress']
                     difficulty_target = recently_fetched_inputs['difficultyTarget']
 
-                    p = spawn_worker(sender_address, last_mined_assets, difficulty_target, VALID_NONCES_DIRECTORY)
-                    state['processes'].append(p)
+                    device_ids = DEVICE_LIST_STRING.split(',')
+                    for device_id in device_ids:
+                        p = spawn_worker(
+                            sender_address,
+                            last_mined_assets,
+                            difficulty_target,
+                            VALID_NONCES_DIRECTORY,
+                            device_id
+                        )
+
+                        time.sleep(3)
+
+                        process_alive = (p.poll() is None)
+                        if not process_alive:
+                            logger.fatal(f'Failed to launch worker with device_id {device_id}. Exiting...')
+                            state['exit'] = True
+                            break
+
+                        state['processes'].append(p)
 
                     state['workerManagerInputs'] = recently_fetched_inputs
 
@@ -118,32 +145,34 @@ def main():
                 submitted_nonces = get_or_init_submitted_nonces()
                 unsubmitted_nonces = nonces - submitted_nonces
 
-                '''
-                There are a few possible scenarios when submitting a nonce for work.
-                1. The nonce is valid and a transaction is submitted.
-                2. The nonce is valid and an error occurs.
-                3. The nonce is invalid and an error occurs.
-                
-                For simplicity, this program does not currently handle retrying
-                on error.
-                '''
-
                 for nonce_file_name in unsubmitted_nonces:
-                    hexNonce = f'0x{nonce_file_name}'
-                    resp = requests.get(f'{controller_uri}/submit-work?nonce={hexNonce}')
+                    hex_nonce = f'0x{nonce_file_name}'
+                    resp = requests.post(f'{controller_uri}/submit-work?nonce={hex_nonce}')
+                    json_data = resp.json()
+                    req_status = json_data['status']
+
+                    if req_status == "success":
+                        append_submitted_nonce(nonce_file_name)
+                    else:
+                        payload = json_data['payload']
+                        if 'nonceStatus' in payload:
+                            nonce_status = payload['nonceStatus']
+                            if nonce_status != NonceStatus.VALID:
+                                # Only add to submitted nonces if the nonce wasn't valid
+                                append_submitted_nonce(nonce_file_name)
+
                     log_payload = {
                         'action': 'submitted_work',
-                        'nonce': hexNonce,
+                        'nonce': hex_nonce,
                         'resp': resp.json()
                     }
                     logger.info(json.dumps(log_payload))
-                    append_submitted_nonce(nonce_file_name)
 
             except Exception as e:
                 logger.error(f'Error while watching for work to submit, or while submitting work: {e}')
                 traceback.print_stack()
 
-            time.sleep(1)
+            time.sleep(5)
 
     inputs_fetcher_thread = threading.Thread(target=inputs_fetcher, args=(CONTROLLER_URI, thread_state), daemon=True)
     worker_manager_thread = threading.Thread(target=worker_manager, args=(thread_state,), daemon=True)
@@ -156,6 +185,8 @@ def main():
     work_submitter_thread.start()
 
     while True:
+        if thread_state['exit']:
+            sys.exit(1)
         time.sleep(0.3)
 
 
